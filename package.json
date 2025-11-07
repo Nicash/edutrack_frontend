@@ -1,5 +1,5 @@
 {
-  "name": "characters-frontend",
+  "name": "edutrack-frontend",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
