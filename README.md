@@ -7,7 +7,7 @@
 
 Frontend del proyecto **EduTrack**, una plataforma colaborativa para estudiantes de **Ingeniería en Sistemas de Información** de la **UTN Facultad Regional Venado Tuerto**.
 
-Este proyecto está desarrollado en **Angular**, siguiendo la base del repositorio **[characters-frontend](https://github.com/utnfrvtdsw/characters-frontend)** utilizado en la cátedra *Desarrollo de Software*.
+Este proyecto está desarrollado en **Angular**, siguiendo la base del repositorio **[characters-frontend](https://github.com/utnfrvtdsw/characters-frontend)** utilizado en la materia *Desarrollo de Software*.
 
 ---
 
@@ -16,8 +16,7 @@ Este proyecto está desarrollado en **Angular**, siguiendo la base del repositor
 EduTrack permite a los estudiantes:
 - Registrarse e iniciar sesión.  
 - Gestionar sus materias (agregar, editar o eliminar).  
-- Consultar fechas de parciales y entregas.  
-- Compartir apuntes y debatir en foros.  
+- Consultar fechas de parciales y entregas.   
 - Recibir notificaciones académicas.
 
 El sistema se comunica con el backend disponible en [Nicash/edutrack](https://github.com/Nicash/edutrack).
@@ -98,7 +97,7 @@ El frontend consume la API REST del proyecto [edutrack-backend](https://github.c
 ## 🧑‍💻 Autores
 
 **Nicolás Chaves** – [@Nicash](https://github.com/Nicash)  
-**Marcos Chaves** – [@marcos04774](https://github.com/marcos04774)  
+**Marcos Gómez** – [@marcos04774](https://github.com/marcos04774)  
 
 Proyecto académico desarrollado en el marco de las asignaturas:
 - **Desarrollo de Software**
