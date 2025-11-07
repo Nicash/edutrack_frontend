@@ -1,13 +1,13 @@
 # EduTrack – Frontend
 
-![Angular](https://img.shields.io/badge/Angular-19-red?logo=angular)
+![Angular](https://img.shields.io/badge/Angular-Standalone-blue?logo=angular)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js-green?logo=node.js)
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen?logo=mongodb)
 ![UTN FRVT](https://img.shields.io/badge/UTN-FRVT-blue)
 
-Frontend del proyecto **EduTrack**, una plataforma colaborativa para estudiantes de **Ingeniería en Sistemas de Información** de la **UTN Facultad Regional Venado Tuerto**.
+Frontend del proyecto **EduTrack**, una interfaz web para gestionar materias y actividades académicas (desarrollada para la UTN - Facultad Regional Venado Tuerto).
 
-Este proyecto está desarrollado en **Angular**, siguiendo la base del repositorio **[characters-frontend](https://github.com/utnfrvtdsw/characters-frontend)** utilizado en la materia *Desarrollo de Software*.
+El frontend está construido con **Angular (standalone components)** y se integra con el backend disponible en el repositorio `Nicash/edutrack`.
 
 ---
 
@@ -38,8 +38,8 @@ El sistema se comunica con el backend disponible en [Nicash/edutrack](https://gi
 
 ### 1️⃣ Clonar el repositorio
 ```bash
-git clone https://github.com/Nicash/edutrack-frontend.git
-cd edutrack-frontend
+git clone https://github.com/Nicash/edutrack_frontend.git
+cd edutrack_frontend
 ```
 
 ### 2️⃣ Instalar dependencias
@@ -48,49 +48,61 @@ npm install
 ```
 
 ### 3️⃣ Configurar entorno
-Editar `src/environments/environment.ts` con la URL del backend:
+Editar `src/environments/environment.ts` con la URL del backend (por defecto el backend corre en el puerto 3001):
 ```ts
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000'
+  apiUrl: 'http://localhost:3001'
 };
 ```
 
 ### 4️⃣ Ejecutar en modo desarrollo
-```bash
+En PowerShell (Windows):
+```powershell
+npm install
+npm run start
+# o bien
 ng serve -o
 ```
-> Por defecto, se abrirá en [http://localhost:4200](http://localhost:4200)
+> Por defecto se abrirá en http://localhost:4200
+
+Notas:
+- El backend de desarrollo corre normalmente en `http://localhost:3001`.
+- El token JWT se guarda en localStorage con la clave `edutrack_token`. El interceptor HTTP añade `Authorization: Bearer <token>` a las peticiones protegidas.
+- El logo utilizado por la app está en `public/logo.png`.
 
 ---
 
-## 🧱 Estructura del proyecto
+## 🧱 Estructura del proyecto (resumen)
 
 ```text
 src/
  ├── app/
  │   ├── core/            # Servicios, guards, interceptores
- │   ├── features/        # Módulos principales (auth, subjects, etc.)
- │   ├── shared/          # Componentes compartidos
+ │   ├── features/        # Componentes/funcionalidades (auth, subjects, etc.)
  │   └── app.routes.ts    # Definición de rutas
  ├── environments/
- └── assets/
+ └── public/              # archivos públicos (logo, favicon)
 ```
 
 ---
 
 ## 🔐 Conexión con el backend
 
-El frontend consume la API REST del proyecto [edutrack-backend](https://github.com/Nicash/edutrack), que incluye endpoints como:
+El frontend consume la API REST del proyecto [edutrack-backend](https://github.com/Nicash/edutrack). Endpoints principales:
 
 | Método | Endpoint | Descripción |
 |--------|-----------|-------------|
-| `POST` | `/auth/login` | Iniciar sesión |
+| `POST` | `/auth/login` | Iniciar sesión (respuesta: { message, data: { token, user } }) |
 | `POST` | `/auth/register` | Crear usuario |
 | `GET`  | `/subject/getAll` | Listar materias |
-| `POST` | `/subject/add` | Agregar materia |
+| `POST` | `/subject/add` | Agregar materia (body: { name, objective, content }) |
 | `PUT`  | `/subject/update/:id` | Editar materia |
-| `DELETE` | `/subject/delete` | Eliminar materia |
+| `DELETE` | `/subject/delete` | Eliminar materia (params: name) |
+
+Detalles importantes:
+- El frontend espera que el token JWT llegue en `res.data.token` tras el login y lo guarda en `localStorage` con la clave `edutrack_token`.
+- Rutas protegidas usan `authGuard`; las páginas públicas (login/register) usan `publicGuard` para evitar re-login si ya estás autenticado.
 
 ---
 
@@ -109,4 +121,4 @@ Proyecto académico desarrollado en el marco de las asignaturas:
 
 ## 📄 Licencia
 
-Proyecto académico sin licencia comercial.
+Proyecto académico (sin licencia comercial especificada). Si querés cambiar la licencia, agregá un archivo `LICENSE`.
