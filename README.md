@@ -121,4 +121,4 @@ Proyecto académico desarrollado en el marco de las asignaturas:
 
 ## 📄 Licencia
 
-Proyecto académico (sin licencia comercial especificada). Si querés cambiar la licencia, agregá un archivo `LICENSE`.
+Proyecto académico (sin licencia comercial especificada).
