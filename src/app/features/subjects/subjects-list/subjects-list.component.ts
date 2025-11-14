@@ -3,6 +3,8 @@ import { SubjectService, Subject } from '../../../core/services/subject.service'
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { CalendarComponent } from '../../../shared/components/calendar/calendar.component';
+import { MESSAGES } from '../../../constants/messages';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-subjects-list',
@@ -13,7 +15,12 @@ import { CalendarComponent } from '../../../shared/components/calendar/calendar.
 })
 export class SubjectsListComponent {
   private api = inject(SubjectService);
+  private toast = inject(ToastService);
   all = signal<Subject[]>([]);
+
+  // Indicadores de carga
+  loading = false;
+  loadingAdd = false;
 
   query = '';
 
@@ -31,29 +38,44 @@ export class SubjectsListComponent {
   }
 
   reload() {
+    this.loading = true;
     this.api.list().subscribe({
       next: (v) => {
         console.log('Materias cargadas:', v);
         this.all.set(v);
+        this.loading = false;
       },
       error: (err) => {
         console.error('Error al cargar materias:', err);
-        alert('Error al cargar materias. Verificá la consola (F12)');
+        this.loading = false;
+        
+        let message = MESSAGES.ERROR_LOADING;
+        
+        if (err.status === 401) {
+          message = MESSAGES.ERROR_UNAUTHORIZED;
+        } else if (err.status === 0) {
+          message = MESSAGES.ERROR_NETWORK;
+        } else if (err.status >= 500) {
+          message = MESSAGES.ERROR_SERVER;
+        }
+        
+        alert(message);
       }
     });
   }
 
   add() {
+    // Validaciones
     if (!this.newName.trim()) {
-      alert('El nombre de la materia no puede estar vacío');
+      this.toast.error('El nombre de la materia no puede estar vacío');
       return;
     }
     if (!this.newObjective.trim()) {
-      alert('El objetivo no puede estar vacío');
+      this.toast.error('El objetivo no puede estar vacío');
       return;
     }
     if (!this.newContent.trim()) {
-      alert('El contenido no puede estar vacío');
+      this.toast.error('El contenido no puede estar vacío');
       return;
     }
     
@@ -68,26 +90,40 @@ export class SubjectsListComponent {
     
     console.log('Agregando materia:', newSubject);
     
+    // Activar indicador de carga
+    this.loadingAdd = true;
+    
     this.api.add(newSubject)
       .subscribe({
         next: (subject) => {
           console.log('✅ Materia agregada exitosamente:', subject);
-          alert('¡Materia agregada exitosamente!');
+          this.loadingAdd = false;
+          
+          this.toast.success(MESSAGES.SUBJECT_ADDED);
+          
+          // Limpiar formulario
           this.newName = '';
           this.newObjective = '';
           this.newContent = '';
+          
           this.reload();
         },
         error: (err) => {
           console.error('❌ Error completo:', err);
           console.error('Error status:', err.status);
           console.error('Error body:', err.error);
+          this.loadingAdd = false;
           
-          let message = 'Error desconocido';
+          let message = MESSAGES.ERROR_SAVING;
+          
           if (err.status === 400) {
-            message = err.error?.error || 'La materia ya existe o faltan campos';
+            message = err.error?.error || MESSAGES.SUBJECT_EXISTS;
           } else if (err.status === 401) {
-            message = 'No autorizado - Iniciá sesión nuevamente';
+            message = MESSAGES.ERROR_UNAUTHORIZED;
+          } else if (err.status === 0) {
+            message = MESSAGES.ERROR_NETWORK;
+          } else if (err.status >= 500) {
+            message = MESSAGES.ERROR_SERVER;
           }
           
           alert(`No se pudo agregar la materia: ${message}`);
@@ -97,33 +133,71 @@ export class SubjectsListComponent {
 
   edit(s: Subject) {
     const name = prompt('Nuevo nombre', s.name);
-    if (!name) return;
+    if (!name || name.trim() === '') return;
+    
+    if (name.trim() === s.name) {
+      this.toast.info('El nombre es el mismo');
+      return;
+    }
+    
     console.log('Editando materia:', s._id, name);
-    this.api.update(s._id!, { ...s, name }).subscribe({
+    
+    this.api.update(s._id!, { ...s, name: name.trim() }).subscribe({
       next: () => {
         console.log('Materia editada exitosamente');
-        alert('¡Materia editada!');
+        this.toast.success(MESSAGES.SUBJECT_UPDATED);
         this.reload();
       },
       error: (err) => {
         console.error('Error al editar:', err);
-        alert(`Error al editar: ${err.error?.message || err.message}`);
+        
+        let message = MESSAGES.ERROR_SAVING;
+        
+        if (err.status === 401) {
+          message = MESSAGES.ERROR_UNAUTHORIZED;
+        } else if (err.status === 404) {
+          message = 'Materia no encontrada';
+        } else if (err.status === 0) {
+          message = MESSAGES.ERROR_NETWORK;
+        } else if (err.status >= 500) {
+          message = MESSAGES.ERROR_SERVER;
+        } else if (err.error?.message) {
+          message = err.error.message;
+        }
+        
+        alert(`Error al editar: ${message}`);
       }
     });
   }
 
   remove(s: Subject) {
-    if (confirm(`¿Eliminar ${s.name}?`)) {
+    if (confirm(`${MESSAGES.SUBJECT_DELETE_CONFIRM}\n\n"${s.name}"`)) {
       console.log('Eliminando materia:', s.name);
+      
       this.api.remove(s.name).subscribe({
         next: () => {
           console.log('Materia eliminada exitosamente');
-          alert('¡Materia eliminada!');
+          this.toast.success(MESSAGES.SUBJECT_DELETED);
           this.reload();
         },
         error: (err) => {
           console.error('Error al eliminar:', err);
-          alert(`Error al eliminar: ${err.error?.message || err.message}`);
+          
+          let message = MESSAGES.ERROR_SAVING;
+          
+          if (err.status === 401) {
+            message = MESSAGES.ERROR_UNAUTHORIZED;
+          } else if (err.status === 404) {
+            message = 'Materia no encontrada';
+          } else if (err.status === 0) {
+            message = MESSAGES.ERROR_NETWORK;
+          } else if (err.status >= 500) {
+            message = MESSAGES.ERROR_SERVER;
+          } else if (err.error?.message) {
+            message = err.error.message;
+          }
+          
+          alert(`Error al eliminar: ${message}`);
         }
       });
     }

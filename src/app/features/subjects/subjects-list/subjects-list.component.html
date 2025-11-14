@@ -8,25 +8,31 @@
             <span class="search-icon">🔍</span>
             <input [(ngModel)]="query" placeholder="Buscar materias..." class="search-input"/>
           </div>
-          <button (click)="reload()" class="btn btn-secondary">
-            <span class="icon">🔄</span> Actualizar
+          <button (click)="reload()" class="btn btn-secondary" [disabled]="loading">
+            <span class="icon">🔄</span> {{ loading ? 'Cargando...' : 'Actualizar' }}
           </button>
         </div>
       </header>
 
-      <div class="empty-state" *ngIf="filtered().length === 0 && query === ''">
+      <div class="empty-state" *ngIf="loading">
+        <div class="empty-icon">⏳</div>
+        <h3>Cargando materias...</h3>
+        <p>Por favor espera un momento</p>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && filtered().length === 0 && query === ''">
         <div class="empty-icon">📖</div>
         <h3>No hay materias todavía</h3>
         <p>Comienza agregando tu primera materia abajo</p>
       </div>
 
-      <div class="empty-state" *ngIf="filtered().length === 0 && query !== ''">
+      <div class="empty-state" *ngIf="!loading && filtered().length === 0 && query !== ''">
         <div class="empty-icon">🔎</div>
         <h3>No se encontraron resultados</h3>
         <p>Intenta con otro término de búsqueda</p>
       </div>
 
-      <ul class="grid" *ngIf="filtered().length > 0">
+      <ul class="grid" *ngIf="!loading && filtered().length > 0">
         <li *ngFor="let s of filtered()" class="card">
           <div class="card-header">
             <h3 class="card-title">{{ s.name }}</h3>
@@ -53,21 +59,24 @@
             [(ngModel)]="newName" 
             placeholder="Nombre de la materia *" 
             class="input-text"
+            [disabled]="loadingAdd"
           />
           <textarea
             [(ngModel)]="newObjective"
             placeholder="Objetivo *"
             class="input-textarea"
             rows="2"
+            [disabled]="loadingAdd"
           ></textarea>
           <textarea
             [(ngModel)]="newContent"
             placeholder="Contenido *"
             class="input-textarea"
             rows="3"
+            [disabled]="loadingAdd"
           ></textarea>
-          <button (click)="add()" class="btn btn-primary btn-full">
-            <span class="icon">➕</span> Agregar Materia
+          <button (click)="add()" class="btn btn-primary btn-full" [disabled]="loadingAdd">
+            <span class="icon">➕</span> {{ loadingAdd ? 'Agregando...' : 'Agregar Materia' }}
           </button>
         </div>
       </footer>

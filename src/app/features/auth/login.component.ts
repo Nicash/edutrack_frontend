@@ -1,8 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { NgIf } from '@angular/common';
+import { MESSAGES } from '../../constants/messages';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -54,12 +56,13 @@ import { NgIf } from '@angular/common';
           
           <button 
             type="submit" 
-            [disabled]="form.invalid" 
+            [disabled]="form.invalid || loading" 
             class="btn-submit"
-            [class.btn-disabled]="form.invalid"
+            [class.btn-disabled]="form.invalid || loading"
           >
-            <span class="btn-icon">🚀</span>
-            Entrar
+            <span class="btn-icon" *ngIf="!loading">🚀</span>
+            <span class="btn-icon" *ngIf="loading">⏳</span>
+            {{ loading ? 'Iniciando sesión...' : 'Entrar' }}
           </button>
         </form>
         
@@ -294,15 +297,44 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private toast = inject(ToastService);
+
+  // Indicador de carga
+  loading = false;
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   onSubmit(){
-    if(this.form.invalid) return;
+    // Validación adicional
+    if(this.form.invalid) {
+      alert(MESSAGES.REQUIRED_FIELDS);
+      return;
+    }
+
     const {email, password} = this.form.value as any;
+
+    // Validaciones manuales adicionales
+    if (!email || !password) {
+      alert(MESSAGES.REQUIRED_FIELDS);
+      return;
+    }
+
+    if (!email.includes('@')) {
+      alert(MESSAGES.INVALID_EMAIL);
+      return;
+    }
+
+    if (password.length < 6) {
+      alert(MESSAGES.INVALID_PASSWORD);
+      return;
+    }
+
+    // Activar indicador de carga
+    this.loading = true;
+
     this.auth.login(email, password).subscribe({
       next: (res) => {
         console.log('✅ Login exitoso, respuesta completa:', res);
@@ -313,21 +345,34 @@ export class LoginComponent {
           this.auth.saveToken(token);
           console.log('💾 Token guardado en localStorage');
           
+          // Mostrar mensaje de éxito
+          this.toast.success(MESSAGES.LOGIN_SUCCESS);
+          
           // Redirigir siempre a /subjects (única ruta protegida)
           this.router.navigate(['/subjects']);
         } else {
           console.error('⚠️ No se encontró el token en la respuesta');
           alert('Error: No se recibió el token de autenticación');
         }
+        
+        this.loading = false;
       },
       error: (err) => {
         console.error('❌ Error completo:', err);
-        let message = 'Error desconocido';
+        this.loading = false;
+        
+        let message = MESSAGES.LOGIN_ERROR;
         
         if (err.status === 403) {
           message = 'Contraseña incorrecta';
         } else if (err.status === 404) {
           message = 'Usuario no encontrado';
+        } else if (err.status === 401) {
+          message = MESSAGES.LOGIN_ERROR;
+        } else if (err.status === 0) {
+          message = MESSAGES.ERROR_NETWORK;
+        } else if (err.status >= 500) {
+          message = MESSAGES.ERROR_SERVER;
         } else if (err.error?.error) {
           message = err.error.error;
         }

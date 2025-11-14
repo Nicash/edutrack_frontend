@@ -1,8 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { NgIf } from '@angular/common';
+import { MESSAGES } from '../../constants/messages';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -70,12 +72,13 @@ import { NgIf } from '@angular/common';
           
           <button 
             type="submit" 
-            [disabled]="form.invalid" 
+            [disabled]="form.invalid || loading" 
             class="btn-submit"
-            [class.btn-disabled]="form.invalid"
+            [class.btn-disabled]="form.invalid || loading"
           >
-            <span class="btn-icon">✨</span>
-            Registrarme
+            <span class="btn-icon" *ngIf="!loading">✨</span>
+            <span class="btn-icon" *ngIf="loading">⏳</span>
+            {{ loading ? 'Registrando...' : 'Registrarme' }}
           </button>
         </form>
         
@@ -310,29 +313,73 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  private toast = inject(ToastService);
+
+  // Indicador de carga
+  loading = false;
 
   form = this.fb.group({
-    name: ['', [Validators.required]],
+    name: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]]
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   onSubmit(){
-    if(this.form.invalid) return;
+    // Validación adicional
+    if(this.form.invalid) {
+      alert(MESSAGES.REQUIRED_FIELDS);
+      return;
+    }
+
     const {name, email, password} = this.form.value as any;
+
+    // Validaciones manuales adicionales
+    if (!name || !email || !password) {
+      alert(MESSAGES.REQUIRED_FIELDS);
+      return;
+    }
+
+    if (name.trim().length < 3) {
+      alert('El nombre debe tener al menos 3 caracteres');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      alert(MESSAGES.INVALID_EMAIL);
+      return;
+    }
+
+    if (password.length < 6) {
+      alert(MESSAGES.INVALID_PASSWORD);
+      return;
+    }
+
+    // Activar indicador de carga
+    this.loading = true;
+
     this.auth.register(name, email, password).subscribe({
       next: (res) => {
         console.log('✅ Registro exitoso:', res);
+        this.loading = false;
+        
         // El registro NO devuelve token, solo el usuario
-        alert('¡Registro exitoso! Ahora podés iniciar sesión.');
+        this.toast.success(MESSAGES.REGISTER_SUCCESS);
         this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error('❌ Error completo:', err);
-        let message = 'Error desconocido';
+        this.loading = false;
+        
+        let message = MESSAGES.REGISTER_ERROR;
         
         if (err.status === 409) {
           message = 'El usuario ya existe';
+        } else if (err.status === 400) {
+          message = 'Datos inválidos. Verificá los campos';
+        } else if (err.status === 0) {
+          message = MESSAGES.ERROR_NETWORK;
+        } else if (err.status >= 500) {
+          message = MESSAGES.ERROR_SERVER;
         } else if (err.error?.error) {
           message = err.error.error;
         }
