@@ -1,0 +1,11 @@
+<div class="mini-cal">
+  <div class="hdr">
+    <button (click)="m = m - 1">‹</button>
+    <div class="title">{{ months[d.getMonth()] }} {{ d.getFullYear() }}</div>
+    <button (click)="m = m + 1">›</button>
+  </div>
+  <div class="grid">
+    <div class="w" *ngFor="let w of ['D','L','M','X','J','V','S']">{{w}}</div>
+    <div *ngFor="let n of days" class="cell" [ngClass]="getEventClass(n)">{{ n }}</div>
+  </div>
+</div>

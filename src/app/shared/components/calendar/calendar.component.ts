@@ -5,30 +5,8 @@ import { NgFor, NgClass } from '@angular/common';
   selector: 'app-calendar',
   standalone: true,
   imports: [NgFor, NgClass],
-  template: `
-    <div class="mini-cal">
-      <div class="hdr">
-        <button (click)="m = m - 1">‹</button>
-        <div class="title">{{ months[d.getMonth()] }} {{ d.getFullYear() }}</div>
-        <button (click)="m = m + 1">›</button>
-      </div>
-      <div class="grid">
-        <div class="w" *ngFor="let w of ['D','L','M','X','J','V','S']">{{w}}</div>
-        <div *ngFor="let n of days" class="cell" [ngClass]="getEventClass(n)">{{ n }}</div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .mini-cal{width:320px;font-family:inherit}
-    .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-    .title{font-weight:600}
-    .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-    .w{font-size:11px;text-align:center;color:#666}
-    .cell{height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:14px;font-weight:500}
-    .cell.exam{background:#FFD700;color:#333}
-    .cell.holiday{background:#FF8C00;color:#fff}
-    button{background:#fff;border:1px solid #e6e6e6;padding:4px 8px;border-radius:6px}
-  `]
+  templateUrl: './calendar.component.html',
+  styleUrls: ['./calendar.component.css']
 })
 export class CalendarComponent {
   d = new Date();
