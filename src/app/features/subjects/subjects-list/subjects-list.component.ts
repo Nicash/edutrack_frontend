@@ -2,90 +2,100 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { SubjectService, Subject } from '../../../core/services/subject.service';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
+import { CalendarComponent } from '../../../shared/components/calendar/calendar.component';
 
 @Component({
   selector: 'app-subjects-list',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule],
+  imports: [NgFor, NgIf, FormsModule, CalendarComponent],
   template: `
   <section class="wrap">
-    <header class="toolbar">
-      <h1 class="title">📚 Mis Materias</h1>
-      <div class="toolbar-actions">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input [(ngModel)]="query" placeholder="Buscar materias..." class="search-input"/>
+    <div class="main-container">
+      <div class="content">
+        <header class="toolbar">
+          <h1 class="title">📚 Mis Materias</h1>
+          <div class="toolbar-actions">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input [(ngModel)]="query" placeholder="Buscar materias..." class="search-input"/>
+            </div>
+            <button (click)="reload()" class="btn btn-secondary">
+              <span class="icon">🔄</span> Actualizar
+            </button>
+          </div>
+        </header>
+
+        <div class="empty-state" *ngIf="filtered().length === 0 && query === ''">
+          <div class="empty-icon">📖</div>
+          <h3>No hay materias todavía</h3>
+          <p>Comienza agregando tu primera materia abajo</p>
         </div>
-        <button (click)="reload()" class="btn btn-secondary">
-          <span class="icon">🔄</span> Actualizar
-        </button>
+
+        <div class="empty-state" *ngIf="filtered().length === 0 && query !== ''">
+          <div class="empty-icon">🔎</div>
+          <h3>No se encontraron resultados</h3>
+          <p>Intenta con otro término de búsqueda</p>
+        </div>
+
+        <ul class="grid" *ngIf="filtered().length > 0">
+          <li *ngFor="let s of filtered()" class="card">
+            <div class="card-header">
+              <h3 class="card-title">{{ s.name }}</h3>
+            </div>
+            <div class="card-content">
+              <p class="objective"><strong>📋 Objetivo:</strong> {{ s.objective }}</p>
+              <p class="content"><strong>📝 Contenido:</strong> {{ s.content }}</p>
+            </div>
+            <div class="card-actions">
+              <button (click)="edit(s)" class="btn btn-edit">
+                <span class="icon">✏️</span> Editar
+              </button>
+              <button (click)="remove(s)" class="btn btn-delete">
+                <span class="icon">🗑️</span> Eliminar
+              </button>
+            </div>
+          </li>
+        </ul>
+
+        <footer class="add-section">
+          <h3 class="add-title">➕ Agregar Nueva Materia</h3>
+          <div class="add-form">
+            <input 
+              [(ngModel)]="newName" 
+              placeholder="Nombre de la materia *" 
+              class="input-text"
+            />
+            <textarea
+              [(ngModel)]="newObjective"
+              placeholder="Objetivo *"
+              class="input-textarea"
+              rows="2"
+            ></textarea>
+            <textarea
+              [(ngModel)]="newContent"
+              placeholder="Contenido *"
+              class="input-textarea"
+              rows="3"
+            ></textarea>
+            <button (click)="add()" class="btn btn-primary btn-full">
+              <span class="icon">➕</span> Agregar Materia
+            </button>
+          </div>
+        </footer>
       </div>
-    </header>
 
-    <div class="empty-state" *ngIf="filtered().length === 0 && query === ''">
-      <div class="empty-icon">📖</div>
-      <h3>No hay materias todavía</h3>
-      <p>Comienza agregando tu primera materia abajo</p>
+      <aside class="sidebar">
+        <app-calendar></app-calendar>
+      </aside>
     </div>
-
-    <div class="empty-state" *ngIf="filtered().length === 0 && query !== ''">
-      <div class="empty-icon">🔎</div>
-      <h3>No se encontraron resultados</h3>
-      <p>Intenta con otro término de búsqueda</p>
-    </div>
-
-    <ul class="grid" *ngIf="filtered().length > 0">
-      <li *ngFor="let s of filtered()" class="card">
-        <div class="card-header">
-          <h3 class="card-title">{{ s.name }}</h3>
-        </div>
-        <div class="card-content">
-          <p class="objective"><strong>📋 Objetivo:</strong> {{ s.objective }}</p>
-          <p class="content"><strong>📝 Contenido:</strong> {{ s.content }}</p>
-        </div>
-        <div class="card-actions">
-          <button (click)="edit(s)" class="btn btn-edit">
-            <span class="icon">✏️</span> Editar
-          </button>
-          <button (click)="remove(s)" class="btn btn-delete">
-            <span class="icon">🗑️</span> Eliminar
-          </button>
-        </div>
-      </li>
-    </ul>
-
-    <footer class="add-section">
-      <h3 class="add-title">➕ Agregar Nueva Materia</h3>
-      <div class="add-form">
-        <input 
-          [(ngModel)]="newName" 
-          placeholder="Nombre de la materia *" 
-          class="input-text"
-        />
-        <textarea
-          [(ngModel)]="newObjective"
-          placeholder="Objetivo *"
-          class="input-textarea"
-          rows="2"
-        ></textarea>
-        <textarea
-          [(ngModel)]="newContent"
-          placeholder="Contenido *"
-          class="input-textarea"
-          rows="3"
-        ></textarea>
-        <button (click)="add()" class="btn btn-primary btn-full">
-          <span class="icon">➕</span> Agregar Materia
-        </button>
-      </div>
-    </footer>
   </section>
   `,
   styles: [`
     * { box-sizing: border-box; }
     
+    .main-container { display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; }
     .wrap { 
-      max-width: 1200px; 
+      max-width: 1400px; 
       margin: 0 auto; 
       padding: 2rem;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -99,6 +109,8 @@ import { NgFor, NgIf } from '@angular/common';
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
+
+    .sidebar { position: sticky; top: 2rem; display:flex; justify-content:flex-end; }
 
     .title { 
       color: white;
