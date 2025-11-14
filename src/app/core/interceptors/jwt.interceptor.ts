@@ -32,22 +32,22 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem('edutrack_token');
 
   // ======================================================================
-  // SECCIÓN 2: AGREGAR TOKEN SI EXISTE
+  // SECCIÓN 2: AGREGAR HEADERS (TOKEN + NGROK)
   // ======================================================================
 
+  // Preparar headers adicionales
+  const headers: { [key: string]: string } = {
+    'ngrok-skip-browser-warning': '69420'  // Header requerido por ngrok
+  };
+
+  // Agregar token JWT si existe
   if (token) {
-    // Los requests HTTP son inmutables, por eso se debe clonar
-    const clonedReq = req.clone({ 
-      setHeaders: { Authorization: `Bearer ${token}` } 
-    });
-    // Continuar con el request modificado
-    return next(clonedReq);
+    headers['Authorization'] = `Bearer ${token}`;
   }
+
+  // Clonar request con todos los headers
+  const clonedReq = req.clone({ setHeaders: headers });
   
-  // ======================================================================
-  // SECCIÓN 3: REQUEST SIN TOKEN
-  // ======================================================================
-  
-  // Si no hay token (por ejemplo en login/register), enviar request original
-  return next(req);
+  // Continuar con el request modificado
+  return next(clonedReq);
 };
