@@ -312,6 +312,8 @@ export class LoginComponent {
         if (token) {
           this.auth.saveToken(token);
           console.log('💾 Token guardado en localStorage');
+          
+          // Redirigir siempre a /subjects (única ruta protegida)
           this.router.navigate(['/subjects']);
         } else {
           console.error('⚠️ No se encontró el token en la respuesta');
