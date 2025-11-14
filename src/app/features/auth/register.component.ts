@@ -1,310 +1,200 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
-import { NgIf } from '@angular/common';
 import { MESSAGES } from '../../constants/messages';
-import { ToastService } from '../../core/services/toast.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgIf],
+  imports: [
+    ReactiveFormsModule, 
+    RouterLink, 
+    NgIf,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule
+  ],
   template: `
-  <section class="register-container">
-    <div class="register-card">
-      <div class="logo-section">
-        <img src="/logo.png" alt="EduTrack Logo" class="logo-image" />
-        <h1 class="logo-title">EduTrack</h1>
-        <p class="logo-subtitle">Gestión educativa simplificada</p>
-      </div>
+  <div class="register-container">
+    <mat-card class="register-card">
+      <mat-card-header class="header">
+        <div class="logo-section">
+          <img src="/logo.png" alt="EduTrack Logo" class="logo" />
+          <mat-card-title>EduTrack</mat-card-title>
+          <mat-card-subtitle>UTN - Facultad Regional Venado Tuerto</mat-card-subtitle>
+        </div>
+      </mat-card-header>
       
-      <div class="form-section">
-        <h2 class="form-title">Crear cuenta</h2>
+      <mat-card-content>
+        <h2 class="title">Crear cuenta</h2>
+        
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">👤</span>
-              Nombre
-            </label>
-            <input 
-              formControlName="name" 
-              type="text"
-              class="form-input"
-              placeholder="Tu nombre completo"
-            />
-            <div class="form-error" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
-              Nombre requerido
-            </div>
-          </div>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre completo</mat-label>
+            <input matInput type="text" formControlName="name" placeholder="Juan Pérez">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="form.get('name')?.hasError('required')">
+              El nombre es requerido
+            </mat-error>
+            <mat-error *ngIf="form.get('name')?.hasError('minlength')">
+              Mínimo 3 caracteres
+            </mat-error>
+          </mat-form-field>
 
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">📧</span>
-              Email
-            </label>
-            <input 
-              formControlName="email" 
-              type="email"
-              class="form-input"
-              placeholder="tu@email.com"
-            />
-            <div class="form-error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="tu@email.com">
+            <mat-icon matPrefix>email</mat-icon>
+            <mat-error *ngIf="form.get('email')?.hasError('required')">
+              El email es requerido
+            </mat-error>
+            <mat-error *ngIf="form.get('email')?.hasError('email')">
               Email inválido
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">🔒</span>
-              Contraseña
-            </label>
-            <input 
-              formControlName="password" 
-              type="password"
-              class="form-input"
-              placeholder="••••••••"
-            />
-            <div class="form-error" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
-              Contraseña requerida
-            </div>
-          </div>
-          
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="••••••••">
+            <mat-icon matPrefix>lock</mat-icon>
+            <mat-error *ngIf="form.get('password')?.hasError('required')">
+              La contraseña es requerida
+            </mat-error>
+            <mat-error *ngIf="form.get('password')?.hasError('minlength')">
+              Mínimo 6 caracteres
+            </mat-error>
+          </mat-form-field>
+
           <button 
+            mat-raised-button 
+            color="primary" 
             type="submit" 
-            [disabled]="form.invalid || loading" 
-            class="btn-submit"
-            [class.btn-disabled]="form.invalid || loading"
+            class="submit-btn"
+            [disabled]="form.invalid || loading"
           >
-            <span class="btn-icon" *ngIf="!loading">✨</span>
-            <span class="btn-icon" *ngIf="loading">⏳</span>
-            {{ loading ? 'Registrando...' : 'Registrarme' }}
+            <mat-icon *ngIf="!loading">person_add</mat-icon>
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+            {{ loading ? 'Creando cuenta...' : 'Registrarse' }}
           </button>
         </form>
-        
-        <div class="footer-link">
-          <p>¿Ya tenés cuenta? <a routerLink="/login" class="link">Iniciá sesión aquí</a></p>
-        </div>
-      </div>
-    </div>
-  </section>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <p class="login-link">
+          ¿Ya tenés cuenta? 
+          <a routerLink="/login" mat-button color="accent">Iniciar sesión</a>
+        </p>
+      </mat-card-actions>
+    </mat-card>
+  </div>
   `,
   styles: [`
-    * { box-sizing: border-box; }
-    
     .register-container {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 2rem;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+      padding: 20px;
     }
 
     .register-card {
-      background: white;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 440px;
       width: 100%;
-      overflow: hidden;
-      animation: slideIn 0.4s ease-out;
+      max-width: 450px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     }
 
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .header {
+      background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+      color: white;
+      padding: 30px 20px;
+      margin: -16px -16px 20px -16px;
     }
 
     .logo-section {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 2.5rem 2rem;
       text-align: center;
-      color: white;
+      width: 100%;
     }
 
-    .logo-image {
+    .logo {
       width: 100px;
       height: 100px;
-      object-fit: contain;
-      margin-bottom: 1rem;
-      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
-      animation: bounce 2s infinite;
+      margin-bottom: 16px;
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .logo-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin: 0 0 0.5rem 0;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .logo-subtitle {
-      font-size: 1rem;
-      margin: 0;
-      opacity: 0.95;
-      font-weight: 300;
-    }
-
-    .form-section {
-      padding: 2.5rem 2rem;
-    }
-
-    .form-title {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin: 0 0 2rem 0;
-      color: #2d3748;
+    mat-card-title {
+      font-size: 28px;
+      margin-bottom: 8px;
       text-align: center;
+      color: white !important;
     }
 
-    .form-group {
-      margin-bottom: 1.5rem;
+    mat-card-subtitle {
+      font-size: 14px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9) !important;
     }
 
-    .form-label {
+    .title {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    form {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #4a5568;
-      margin-bottom: 0.5rem;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .label-icon {
-      font-size: 1.2rem;
-    }
-
-    .form-input {
+    .full-width {
       width: 100%;
-      padding: 0.875rem 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      background: #f7fafc;
     }
 
-    .form-input:focus {
-      outline: none;
-      border-color: #667eea;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
-
-    .form-input::placeholder {
-      color: #a0aec0;
-    }
-
-    .form-error {
-      color: #e53e3e;
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .form-error::before {
-      content: '⚠️';
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+    .submit-btn {
+      margin-top: 16px;
+      height: 48px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      margin-top: 2rem;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      gap: 8px;
     }
 
-    .btn-submit:hover:not(.btn-disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    mat-card-actions {
+      justify-content: center;
+      padding: 16px;
     }
 
-    .btn-submit:active:not(.btn-disabled) {
-      transform: translateY(0);
-    }
-
-    .btn-disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .btn-icon {
-      font-size: 1.3rem;
-    }
-
-    .footer-link {
+    .login-link {
       text-align: center;
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e2e8f0;
-    }
-
-    .footer-link p {
       margin: 0;
-      color: #718096;
-      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .link {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.2s ease;
-    }
-
-    .link:hover {
-      color: #764ba2;
-      text-decoration: underline;
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       .register-container {
-        padding: 1rem;
+        padding: 10px;
       }
-
-      .logo-section {
-        padding: 2rem 1.5rem;
-      }
-
-      .logo-icon {
-        font-size: 3rem;
-      }
-
-      .logo-title {
-        font-size: 2rem;
-      }
-
-      .form-section {
-        padding: 2rem 1.5rem;
+      
+      .logo {
+        width: 80px;
+        height: 80px;
       }
     }
   `]
@@ -313,9 +203,8 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
-  private toast = inject(ToastService);
+  private snackBar = inject(MatSnackBar);
 
-  // Indicador de carga
   loading = false;
 
   form = this.fb.group({
@@ -324,37 +213,14 @@ export class RegisterComponent {
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  onSubmit(){
-    // Validación adicional
-    if(this.form.invalid) {
-      alert(MESSAGES.REQUIRED_FIELDS);
+  onSubmit() {
+    if (this.form.invalid) {
+      this.snackBar.open(MESSAGES.REQUIRED_FIELDS, 'Cerrar', { duration: 3000 });
       return;
     }
 
-    const {name, email, password} = this.form.value as any;
+    const { name, email, password } = this.form.value as any;
 
-    // Validaciones manuales adicionales
-    if (!name || !email || !password) {
-      alert(MESSAGES.REQUIRED_FIELDS);
-      return;
-    }
-
-    if (name.trim().length < 3) {
-      alert('El nombre debe tener al menos 3 caracteres');
-      return;
-    }
-
-    if (!email.includes('@')) {
-      alert(MESSAGES.INVALID_EMAIL);
-      return;
-    }
-
-    if (password.length < 6) {
-      alert(MESSAGES.INVALID_PASSWORD);
-      return;
-    }
-
-    // Activar indicador de carga
     this.loading = true;
 
     this.auth.register(name, email, password).subscribe({
@@ -362,31 +228,31 @@ export class RegisterComponent {
         console.log('✅ Registro exitoso:', res);
         this.loading = false;
         
-        // El registro NO devuelve token, solo el usuario
-        this.toast.success(MESSAGES.REGISTER_SUCCESS);
+        this.snackBar.open(MESSAGES.REGISTER_SUCCESS, 'Cerrar', {
+          duration: 4000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        console.error('❌ Error completo:', err);
+        console.error('❌ Error:', err);
         this.loading = false;
         
         let message = MESSAGES.REGISTER_ERROR;
         
-        if (err.status === 409) {
-          message = 'El usuario ya existe';
-        } else if (err.status === 400) {
-          message = 'Datos inválidos. Verificá los campos';
+        if (err.status === 400) {
+          message = err.error?.error || 'El email ya está registrado';
         } else if (err.status === 0) {
           message = MESSAGES.ERROR_NETWORK;
         } else if (err.status >= 500) {
           message = MESSAGES.ERROR_SERVER;
-        } else if (err.error?.error) {
-          message = err.error.error;
+        } else if (err.error?.message) {
+          message = err.error.message;
         }
         
-        alert(`No se pudo registrar: ${message}`);
+        this.snackBar.open(`Error: ${message}`, 'Cerrar', { duration: 4000 });
       }
     });
   }
 }
-

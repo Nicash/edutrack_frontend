@@ -1,17 +1,12 @@
-<app-toast></app-toast>
-
-<nav class="topbar" *ngIf="auth.isLoggedIn()">
-  <div class="nav-content">
-    <a routerLink="/subjects" class="brand">
-      <img src="/logo.png" alt="EduTrack Logo" class="brand-icon" />
-      <span class="brand-text">EduTrack</span>
-    </a>
-    <div class="nav-actions">
-      <button (click)="logout()" class="btn-logout">
-        <span class="icon">🚪</span>
-        Cerrar sesión
-      </button>
-    </div>
-  </div>
-</nav>
+<mat-toolbar color="primary" *ngIf="auth.isLoggedIn()" class="navbar">
+  <button mat-icon-button routerLink="/subjects">
+    <img src="/logo.png" alt="EduTrack Logo" class="logo" />
+  </button>
+  <span class="brand-text" routerLink="/subjects">EduTrack</span>
+  <span class="spacer"></span>
+  <button mat-raised-button color="warn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Cerrar sesión
+  </button>
+</mat-toolbar>
 <router-outlet/>

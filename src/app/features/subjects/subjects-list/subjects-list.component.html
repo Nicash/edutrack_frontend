@@ -1,85 +1,111 @@
 <section class="wrap">
   <div class="main-container">
     <div class="content">
-      <header class="toolbar">
-        <h1 class="title">📚 Mis Materias</h1>
+      <!-- Header con búsqueda -->
+      <div class="header-section">
+        <h1 class="page-title">
+          <mat-icon>school</mat-icon>
+          Mis Materias
+        </h1>
         <div class="toolbar-actions">
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input [(ngModel)]="query" placeholder="Buscar materias..." class="search-input"/>
-          </div>
-          <button (click)="reload()" class="btn btn-secondary" [disabled]="loading">
-            <span class="icon">🔄</span> {{ loading ? 'Cargando...' : 'Actualizar' }}
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar materias</mat-label>
+            <input matInput [value]="query()" (input)="query.set($any($event.target).value)" placeholder="Buscar...">
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="reload()" [disabled]="loading">
+            <mat-icon>refresh</mat-icon>
+            {{ loading ? 'Cargando...' : 'Actualizar' }}
           </button>
         </div>
-      </header>
-
-      <div class="empty-state" *ngIf="loading">
-        <div class="empty-icon">⏳</div>
-        <h3>Cargando materias...</h3>
-        <p>Por favor espera un momento</p>
       </div>
 
-      <div class="empty-state" *ngIf="!loading && filtered().length === 0 && query === ''">
-        <div class="empty-icon">📖</div>
+      <!-- Progress bar -->
+      <mat-progress-bar *ngIf="loading" mode="indeterminate" color="accent"></mat-progress-bar>
+
+      <!-- Estados vacíos -->
+      <div class="empty-state" *ngIf="!loading && all().length === 0">
+        <mat-icon class="empty-icon">menu_book</mat-icon>
         <h3>No hay materias todavía</h3>
         <p>Comienza agregando tu primera materia abajo</p>
       </div>
 
-      <div class="empty-state" *ngIf="!loading && filtered().length === 0 && query !== ''">
-        <div class="empty-icon">🔎</div>
+      <div class="empty-state" *ngIf="!loading && all().length > 0 && filtered().length === 0">
+        <mat-icon class="empty-icon">search_off</mat-icon>
         <h3>No se encontraron resultados</h3>
         <p>Intenta con otro término de búsqueda</p>
       </div>
 
-      <ul class="grid" *ngIf="!loading && filtered().length > 0">
-        <li *ngFor="let s of filtered()" class="card">
-          <div class="card-header">
-            <h3 class="card-title">{{ s.name }}</h3>
-          </div>
-          <div class="card-content">
-            <p class="objective"><strong>📋 Objetivo:</strong> {{ s.objective }}</p>
-            <p class="content"><strong>📝 Contenido:</strong> {{ s.content }}</p>
-          </div>
-          <div class="card-actions">
-            <button (click)="edit(s)" class="btn btn-edit">
-              <span class="icon">✏️</span> Editar
+      <!-- Lista de materias con MatCard -->
+      <div class="subjects-grid" *ngIf="!loading && filtered().length > 0">
+        <mat-card *ngFor="let s of filtered()" class="subject-card">
+          <mat-card-header>
+            <mat-card-title>{{ s.name }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="subject-field">
+              <mat-icon>flag</mat-icon>
+              <div>
+                <strong>Objetivo:</strong>
+                <p>{{ s.objective }}</p>
+              </div>
+            </div>
+            <div class="subject-field">
+              <mat-icon>description</mat-icon>
+              <div>
+                <strong>Contenido:</strong>
+                <p>{{ s.content }}</p>
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="edit(s)">
+              <mat-icon>edit</mat-icon>
+              Editar
             </button>
-            <button (click)="remove(s)" class="btn btn-delete">
-              <span class="icon">🗑️</span> Eliminar
+            <button mat-button color="warn" (click)="remove(s)">
+              <mat-icon>delete</mat-icon>
+              Eliminar
             </button>
-          </div>
-        </li>
-      </ul>
+          </mat-card-actions>
+        </mat-card>
+      </div>
 
-      <footer class="add-section">
-        <h3 class="add-title">➕ Agregar Nueva Materia</h3>
-        <div class="add-form">
-          <input 
-            [(ngModel)]="newName" 
-            placeholder="Nombre de la materia *" 
-            class="input-text"
-            [disabled]="loadingAdd"
-          />
-          <textarea
-            [(ngModel)]="newObjective"
-            placeholder="Objetivo *"
-            class="input-textarea"
-            rows="2"
-            [disabled]="loadingAdd"
-          ></textarea>
-          <textarea
-            [(ngModel)]="newContent"
-            placeholder="Contenido *"
-            class="input-textarea"
-            rows="3"
-            [disabled]="loadingAdd"
-          ></textarea>
-          <button (click)="add()" class="btn btn-primary btn-full" [disabled]="loadingAdd">
-            <span class="icon">➕</span> {{ loadingAdd ? 'Agregando...' : 'Agregar Materia' }}
+      <!-- Formulario de agregar materia -->
+      <mat-card class="add-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>add_circle</mat-icon>
+            Agregar Nueva Materia
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-progress-bar *ngIf="loadingAdd" mode="indeterminate" color="accent"></mat-progress-bar>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre de la materia</mat-label>
+            <input matInput [(ngModel)]="newName" [disabled]="loadingAdd" placeholder="Ej: Programación">
+            <mat-icon matPrefix>subject</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Objetivo</mat-label>
+            <textarea matInput [(ngModel)]="newObjective" [disabled]="loadingAdd" rows="2" placeholder="Objetivo de la materia"></textarea>
+            <mat-icon matPrefix>flag</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contenido</mat-label>
+            <textarea matInput [(ngModel)]="newContent" [disabled]="loadingAdd" rows="3" placeholder="Contenido del curso"></textarea>
+            <mat-icon matPrefix>description</mat-icon>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="add()" [disabled]="loadingAdd" class="add-btn">
+            <mat-icon>add</mat-icon>
+            {{ loadingAdd ? 'Agregando...' : 'Agregar Materia' }}
           </button>
-        </div>
-      </footer>
+        </mat-card-content>
+      </mat-card>
     </div>
 
     <aside class="sidebar">

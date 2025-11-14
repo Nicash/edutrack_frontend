@@ -4,32 +4,54 @@ import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { CalendarComponent } from '../../../shared/components/calendar/calendar.component';
 import { MESSAGES } from '../../../constants/messages';
-import { ToastService } from '../../../core/services/toast.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-subjects-list',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, CalendarComponent],
+  imports: [
+    NgFor, 
+    NgIf, 
+    FormsModule, 
+    CalendarComponent,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+    MatProgressBarModule,
+    MatChipsModule
+  ],
   templateUrl: './subjects-list.component.html',
   styleUrls: ['./subjects-list.component.css']
 })
 export class SubjectsListComponent {
   private api = inject(SubjectService);
-  private toast = inject(ToastService);
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
   all = signal<Subject[]>([]);
 
   // Indicadores de carga
   loading = false;
   loadingAdd = false;
 
-  query = '';
+  query = signal('');
 
   newName = '';
   newObjective = '';
   newContent = '';
 
   filtered = computed(() => {
-    const k = this.query.toLowerCase();
+    const k = this.query().toLowerCase();
     return this.all().filter(s => s.name.toLowerCase().includes(k));
   });
 
@@ -67,15 +89,27 @@ export class SubjectsListComponent {
   add() {
     // Validaciones
     if (!this.newName.trim()) {
-      this.toast.error('El nombre de la materia no puede estar vacío');
+      this.snackBar.open('El nombre de la materia no puede estar vacío', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
       return;
     }
     if (!this.newObjective.trim()) {
-      this.toast.error('El objetivo no puede estar vacío');
+      this.snackBar.open('El objetivo no puede estar vacío', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
       return;
     }
     if (!this.newContent.trim()) {
-      this.toast.error('El contenido no puede estar vacío');
+      this.snackBar.open('El contenido no puede estar vacío', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
       return;
     }
     
@@ -99,7 +133,11 @@ export class SubjectsListComponent {
           console.log('✅ Materia agregada exitosamente:', subject);
           this.loadingAdd = false;
           
-          this.toast.success(MESSAGES.SUBJECT_ADDED);
+          this.snackBar.open(MESSAGES.SUBJECT_ADDED, 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
           
           // Limpiar formulario
           this.newName = '';
@@ -136,7 +174,11 @@ export class SubjectsListComponent {
     if (!name || name.trim() === '') return;
     
     if (name.trim() === s.name) {
-      this.toast.info('El nombre es el mismo');
+      this.snackBar.open('El nombre es el mismo', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
       return;
     }
     
@@ -145,7 +187,11 @@ export class SubjectsListComponent {
     this.api.update(s._id!, { ...s, name: name.trim() }).subscribe({
       next: () => {
         console.log('Materia editada exitosamente');
-        this.toast.success(MESSAGES.SUBJECT_UPDATED);
+        this.snackBar.open(MESSAGES.SUBJECT_UPDATED, 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
         this.reload();
       },
       error: (err) => {
@@ -177,7 +223,11 @@ export class SubjectsListComponent {
       this.api.remove(s.name).subscribe({
         next: () => {
           console.log('Materia eliminada exitosamente');
-          this.toast.success(MESSAGES.SUBJECT_DELETED);
+          this.snackBar.open(MESSAGES.SUBJECT_DELETED, 'Cerrar', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
           this.reload();
         },
         error: (err) => {
