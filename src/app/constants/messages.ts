@@ -3,12 +3,12 @@
 // ===================================
 /**
  * Archivo centralizado de mensajes para la aplicación
- * Facilita el mantenimiento y la internacionalización futura
+ * Facilita el mantenimiento y una posible traducción futura
  */
 
 export const MESSAGES = {
   // Mensajes de autenticación
-  LOGIN_SUCCESS: '¡Bienvenido a EduTrack!',
+  LOGIN_SUCCESS: '¡Bienvenido a EduTrack - UTN FRVT!',
   LOGIN_ERROR: 'Usuario o contraseña incorrectos',
   LOGOUT_CONFIRM: '¿Estás seguro que querés cerrar sesión?',
   LOGOUT_SUCCESS: '¡Sesión cerrada exitosamente!',

@@ -29,6 +29,7 @@ export class CalendarComponent {
     '2025-11-17': 'holiday',  // Soberanía Nacional
     '2025-12-8': 'holiday',   // Inmaculada Concepción
     '2025-12-25': 'holiday',  // Navidad
+    
     // Mesas de exámenes (ejemplos)
     '2025-11-18': 'exam',
     '2025-11-19': 'exam',

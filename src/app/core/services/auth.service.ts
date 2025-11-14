@@ -1,13 +1,15 @@
-// ===================================
+// ======================================================================
 // IMPORTACIONES
-// ===================================
+// ======================================================================
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
-// ===================================
+// ======================================================================
 // INTERFACES DE TIPOS
-// ===================================
+// ======================================================================
+
 // Estructura del usuario devuelto por el backend
 export interface User {
   _id: string;
@@ -30,9 +32,10 @@ export interface RegisterResponse {
   user: User;
 }
 
-// ===================================
+// ======================================================================
 // SERVICIO DE AUTENTICACIÓN
-// ===================================
+// ======================================================================
+
 /**
  * AuthService - Servicio centralizado de autenticación
  * 
@@ -41,6 +44,7 @@ export interface RegisterResponse {
  * - Gestión del token JWT en localStorage
  * - Verificación del estado de autenticación
  */
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);

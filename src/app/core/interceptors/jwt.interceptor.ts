@@ -1,5 +1,12 @@
-// Interceptor funcional de Angular que automáticamente agrega el token JWT a todas las peticiones HTTP
+// ======================================================================
+// IMPORTACIONES
+// ======================================================================
+
 import { HttpInterceptorFn } from '@angular/common/http';
+
+// ======================================================================
+// INTERCEPTOR JWT
+// ======================================================================
 
 /**
  * jwtInterceptor - Interceptor HTTP funcional
@@ -11,24 +18,36 @@ import { HttpInterceptorFn } from '@angular/common/http';
  * 2. Busca el token en localStorage
  * 3. Si existe token: clona el request y agrega header "Authorization: Bearer {token}"
  * 4. Si NO existe token: deja pasar el request sin modificar
+ * 
+ * ¿Por qué es necesario?
+ * El backend protege las rutas y valida el token en cada petición.
+ * Sin este interceptor, tendríamos que agregar manualmente el header en cada llamada HTTP.
  */
+
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-  // 1️⃣ Obtener el token guardado en localStorage (si existe)
-  const token = localStorage.getItem('edutrack_token');
-  console.log('🔑 Token en localStorage:', token ? 'Sí existe' : 'No existe');
+  // ======================================================================
+  // SECCIÓN 1: OBTENER TOKEN
+  // ======================================================================
   
-  // 2️⃣ Si hay token, agregarlo al header Authorization
+  const token = localStorage.getItem('edutrack_token');
+
+  // ======================================================================
+  // SECCIÓN 2: AGREGAR TOKEN SI EXISTE
+  // ======================================================================
+
   if (token) {
-    // Clonar el request original y agregar el header (los requests son inmutables)
+    // Los requests HTTP son inmutables, por eso se debe clonar
     const clonedReq = req.clone({ 
       setHeaders: { Authorization: `Bearer ${token}` } 
     });
-    console.log('📤 Request con token:', clonedReq.url);
-    // Enviar el request modificado con el token
+    // Continuar con el request modificado
     return next(clonedReq);
   }
   
-  // 3️⃣ Si NO hay token, enviar el request original sin modificar
-  console.log('📤 Request sin token:', req.url);
+  // ======================================================================
+  // SECCIÓN 3: REQUEST SIN TOKEN
+  // ======================================================================
+  
+  // Si no hay token (por ejemplo en login/register), enviar request original
   return next(req);
 };
