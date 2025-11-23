@@ -43,10 +43,15 @@ export const routes: Routes = [
   // RUTAS PRIVADAS (requieren autenticación)
   // ===================================
   // Solo accesibles si ESTÁS logueado (gracias a authGuard)
-  { 
-    path: 'subjects', 
-    canActivate: [authGuard], // Redirige a /login si no estás logueado
-    loadComponent: () => import('./features/subjects/subjects-list/subjects-list.component').then(m => m.SubjectsListComponent) 
+  {
+    path: 'subjects',
+    canActivate: [authGuard], // Redirige a /login si no est�s logueado
+    loadComponent: () => import('./features/subjects/subjects-list/subjects-list.component').then(m => m.SubjectsListComponent)
+  },
+  {
+    path: 'subscriptions',
+    canActivate: [authGuard], // Redirige a /login si no est�s logueado
+    loadComponent: () => import('./features/subjects/subscriptions/subscriptions.component').then(m => m.SubscriptionsComponent)
   },
   
   // ===================================
@@ -58,3 +63,4 @@ export const routes: Routes = [
   // Ruta no encontrada: Cualquier URL inválida redirige a /subjects
   { path: '**', redirectTo: 'subjects' },
 ];
+

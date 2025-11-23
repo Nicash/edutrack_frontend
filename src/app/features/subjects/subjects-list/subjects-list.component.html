@@ -3,9 +3,9 @@
     <div class="content">
       <!-- Header con búsqueda -->
       <div class="header-section">
-        <h1 class="page-title">
+        <h1 class="page-title" [class.subscribed-mode]="showOnlySubscribed">
           <mat-icon>school</mat-icon>
-          Mis Materias
+          {{ showOnlySubscribed ? 'Mis Materias' : 'Materias Disponibles' }}
         </h1>
         <div class="toolbar-actions">
           <mat-form-field appearance="outline" class="search-field">
@@ -20,14 +20,26 @@
         </div>
       </div>
 
+      <!-- Filtros y navegación -->
+      <div class="filter-actions" *ngIf="!isAdmin()">
+        <button mat-raised-button [color]="showOnlySubscribed ? 'primary' : 'basic'" (click)="toggleFilter()">
+          <mat-icon>{{ showOnlySubscribed ? 'filter_alt' : 'filter_alt_off' }}</mat-icon>
+          {{ showOnlySubscribed ? 'Mostrar Todas Las Materias' : 'Mostrar Solo Mis Materias' }}
+        </button>
+        <button mat-raised-button color="accent" (click)="goToSubscriptions()">
+          <mat-icon>settings</mat-icon>
+          Gestionar suscripciones
+        </button>
+      </div>
+
       <!-- Progress bar -->
       <mat-progress-bar *ngIf="loading" mode="indeterminate" color="accent"></mat-progress-bar>
 
       <!-- Estados vacíos -->
       <div class="empty-state" *ngIf="!loading && all().length === 0">
         <mat-icon class="empty-icon">menu_book</mat-icon>
-        <h3>No hay materias todavía</h3>
-        <p>Comienza agregando tu primera materia abajo</p>
+        <h3>{{ showOnlySubscribed ? 'No tienes suscripciones activas' : (isAdmin() ? 'No hay materias todavía' : 'No hay materias disponibles') }}</h3>
+        <p>{{ showOnlySubscribed ? 'Ve a "Gestionar suscripciones" para suscribirte a materias' : (isAdmin() ? 'Comienza agregando tu primera materia abajo' : 'Pronto se agregarán materias al sistema') }}</p>
       </div>
 
       <div class="empty-state" *ngIf="!loading && all().length > 0 && filtered().length === 0">
@@ -38,7 +50,7 @@
 
       <!-- Lista de materias con MatCard -->
       <div class="subjects-grid" *ngIf="!loading && filtered().length > 0">
-        <mat-card *ngFor="let s of filtered()" class="subject-card">
+        <mat-card *ngFor="let s of filtered()" class="subject-card" [class.subscribed-mode]="showOnlySubscribed">
           <mat-card-header>
             <mat-card-title>{{ s.name }}</mat-card-title>
           </mat-card-header>
@@ -58,7 +70,7 @@
               </div>
             </div>
           </mat-card-content>
-          <mat-card-actions>
+          <mat-card-actions *ngIf="isAdmin()">
             <button mat-button color="primary" (click)="edit(s)">
               <mat-icon>edit</mat-icon>
               Editar
@@ -71,8 +83,8 @@
         </mat-card>
       </div>
 
-      <!-- Formulario de agregar materia -->
-      <mat-card class="add-card">
+      <!-- Formulario de agregar materia (solo admin) -->
+      <mat-card class="add-card" *ngIf="isAdmin()">
         <mat-card-header>
           <mat-card-title>
             <mat-icon>add_circle</mat-icon>

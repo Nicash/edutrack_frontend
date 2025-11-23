@@ -2,7 +2,9 @@
 // SECCIÓN 1: IMPORTACIONES
 // ======================================================================
 import { Component, inject, signal, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { SubjectService, Subject } from '../../../core/services/subject.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { CalendarComponent } from '../../../shared/components/calendar/calendar.component';
@@ -68,6 +70,8 @@ export class SubjectsListComponent {
   // ======================================================================
 
   private api = inject(SubjectService);    // Servicio CRUD de materias
+  private auth = inject(AuthService);      // Servicio de autenticación (para verificar rol)
+  private router = inject(Router);         // Router para navegación
   private snackBar = inject(MatSnackBar);  // Notificaciones Material
   private dialog = inject(MatDialog);      // Diálogos de confirmación
 
@@ -114,6 +118,12 @@ export class SubjectsListComponent {
   newContent = '';
 
   // ======================================================================
+  // SUBSECCIÓN 3.2B: ESTADO DE FILTRO DE SUSCRIPCIONES
+  // ======================================================================
+  
+  showOnlySubscribed = false;  // Estado del filtro de suscripciones
+
+  // ======================================================================
   // SUBSECCIÓN 3.5: CONSTRUCTOR E INICIALIZACIÓN
   // ======================================================================
   /**
@@ -122,7 +132,34 @@ export class SubjectsListComponent {
    */
 
   constructor() {
+    // Si no es admin, por defecto mostrar solo materias suscritas
+    if (!this.auth.isAdmin()) {
+      this.showOnlySubscribed = true;
+    }
     this.reload();
+  }
+
+  // ======================================================================
+  // SUBSECCI�N 3.5C: M�TODOS DE FILTRO Y NAVEGACI�N
+  // ======================================================================
+  
+  /**
+   * toggleFilter - Alterna entre mostrar todas las materias o solo las suscritas
+   */
+  toggleFilter() {
+    this.showOnlySubscribed = !this.showOnlySubscribed;
+    this.reload();
+  }
+
+  /**
+   * goToSubscriptions - Navega a la p�gina de gesti�n de suscripciones
+   */
+  goToSubscriptions() {
+    this.router.navigate(['/subscriptions']);
+  }
+
+  isAdmin(): boolean {
+    return this.auth.isAdmin();
   }
 
   // ======================================================================
@@ -144,9 +181,17 @@ export class SubjectsListComponent {
 
   reload() {
     this.loading = true;
-    this.api.list().subscribe({
-      next: (v) => {
-        this.all.set(v);  // Actualizar materias
+    
+    // Admin siempre ve todas las materias, usuarios normales pueden filtrar
+    const observable = (this.showOnlySubscribed && !this.auth.isAdmin())
+      ? this.api.getMySubscriptions()
+      : this.api.list();
+    
+    observable.subscribe({
+      next: (response: any) => {
+        // Si es respuesta de suscripciones, viene en response.data
+        const subjects = response.data || response;
+        this.all.set(subjects);  // Actualizar materias
         this.loading = false;
       },
       error: (err) => {
@@ -199,7 +244,19 @@ export class SubjectsListComponent {
   add() {
 
     // ===================================
-    // PASO 1: VALIDACIONES
+    // PASO 1: VERIFICAR PERMISOS
+    // ===================================
+    if (!this.auth.isAdmin()) {
+      this.snackBar.open('No tienes permisos para agregar materias', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    // ===================================
+    // PASO 2: VALIDACIONES
     // ===================================
     if (!this.newName.trim()) {
       this.snackBar.open('El nombre de la materia no puede estar vacío', 'Cerrar', {
@@ -317,6 +374,18 @@ export class SubjectsListComponent {
 
   edit(s: Subject) {
 
+    // ===================================
+    // VERIFICAR PERMISOS
+    // ===================================
+    if (!this.auth.isAdmin()) {
+      this.snackBar.open('No tienes permisos para editar materias', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
     // Pedir nuevo nombre mediante prompt nativo
     const name = prompt('Nuevo nombre', s.name);
     if (!name || name.trim() === '') return;  // Cancelado o vacío
@@ -394,6 +463,18 @@ export class SubjectsListComponent {
 
   remove(s: Subject) {
 
+    // ===================================
+    // VERIFICAR PERMISOS
+    // ===================================
+    if (!this.auth.isAdmin()) {
+      this.snackBar.open('No tienes permisos para eliminar materias', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
     // Abrir diálogo de confirmación Material
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -453,3 +534,5 @@ export class SubjectsListComponent {
     });
   }
 }
+
+

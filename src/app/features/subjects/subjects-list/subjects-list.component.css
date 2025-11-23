@@ -35,6 +35,12 @@
   font-size: 2rem;
   font-weight: 500;
   color: #5e72e4;
+  transition: color 0.3s ease;
+}
+
+/* Color verde cuando está en modo "Mis Materias" */
+.page-title.subscribed-mode {
+  color: #2dce89;
 }
 
 .page-title mat-icon {
@@ -51,6 +57,21 @@
 
 .search-field {
   min-width: 300px;
+}
+
+/* Filter Actions Section */
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  flex-wrap: wrap;
+}
+
+.filter-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Empty States */
@@ -103,6 +124,12 @@ mat-card-header {
   padding: 20px;
   margin: -16px -16px 20px -16px;
   border-radius: 4px 4px 0 0;
+  transition: background 0.3s ease;
+}
+
+/* Header verde cuando está en modo "Mis Materias" */
+.subject-card.subscribed-mode mat-card-header {
+  background: linear-gradient(135deg, #2dce89 0%, #2dcecc 100%);
 }
 
 mat-card-title {
@@ -123,6 +150,12 @@ mat-card-title {
   color: #5e72e4;
   flex-shrink: 0;
   margin-top: 2px;
+  transition: color 0.3s ease;
+}
+
+/* Iconos verdes cuando está en modo "Mis Materias" */
+.subject-card.subscribed-mode .subject-field mat-icon {
+  color: #2dce89;
 }
 
 .subject-field strong {
@@ -230,5 +263,13 @@ mat-card-actions {
 
   .page-title {
     font-size: 1.5rem;
+  }
+
+  .filter-actions {
+    flex-direction: column;
+  }
+
+  .filter-actions button {
+    width: 100%;
   }
 }

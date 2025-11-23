@@ -99,4 +99,56 @@ export class SubjectService {
   remove(name: string) { 
     return this.http.delete(`${this.base}/subject/delete`, { params: { name } }); 
   }
+
+  // ===================================
+  // M�TODOS DE SUSCRIPCI�N
+  // ===================================
+
+  /**
+   * getAllWithStatus - Obtiene todas las materias con indicador de suscripción
+   * GET /subscription/all-with-status
+   * @returns Observable con array de materias incluyendo campo isSubscribed
+   */
+  getAllWithStatus() {
+    return this.http.get<any>(`${this.base}/subscription/all-with-status`);
+  }
+
+  /**
+   * getMySubscriptions - Obtiene solo las materias a las que está suscrito el usuario
+   * GET /subscription/my-subscriptions
+   * @returns Observable con array de materias suscritas
+   */
+  getMySubscriptions() {
+    return this.http.get<any>(`${this.base}/subscription/my-subscriptions`);
+  }
+
+  /**
+   * subscribe - Suscribe al usuario a una materia
+   * POST /subscription/subscribe
+   * @param subjectId - ID de la materia a suscribirse
+   * @returns Observable con respuesta del backend
+   */
+  subscribe(subjectId: string) {
+    return this.http.post<any>(`${this.base}/subscription/subscribe`, { subjectId });
+  }
+
+  /**
+   * unsubscribe - Desuscribe al usuario de una materia
+   * POST /subscription/unsubscribe
+   * @param subjectId - ID de la materia a desuscribirse
+   * @returns Observable con respuesta del backend
+   */
+  unsubscribe(subjectId: string) {
+    return this.http.post<any>(`${this.base}/subscription/unsubscribe`, { subjectId });
+  }
+
+  /**
+   * toggleSubscription - Alterna el estado de suscripci�n de una materia
+   * @param subjectId - ID de la materia
+   * @param isSubscribed - Estado actual de suscripci�n
+   * @returns Observable con respuesta del backend
+   */
+  toggleSubscription(subjectId: string, isSubscribed: boolean) {
+    return isSubscribed ? this.unsubscribe(subjectId) : this.subscribe(subjectId);
+  }
 }

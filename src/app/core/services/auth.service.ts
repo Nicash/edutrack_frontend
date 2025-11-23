@@ -15,6 +15,7 @@ export interface User {
   _id: string;
   email: string;
   name: string;
+  role: 'admin' | 'user';  // Rol del usuario (admin puede CRUD, user solo lectura)
 }
 
 // Respuesta del endpoint POST /auth/login
@@ -91,6 +92,32 @@ export class AuthService {
   }
   
   /**
+   * saveUser - Guarda los datos del usuario en localStorage
+   * Se ejecuta después de login exitoso para tener el rol disponible
+   */
+  saveUser(user: User) {
+    localStorage.setItem('edutrack_user', JSON.stringify(user));
+  }
+  
+  /**
+   * getUser - Obtiene los datos del usuario guardados
+   * @returns Usuario o null si no existe
+   */
+  getUser(): User | null {
+    const userStr = localStorage.getItem('edutrack_user');
+    return userStr ? JSON.parse(userStr) : null;
+  }
+  
+  /**
+   * isAdmin - Verifica si el usuario actual es administrador
+   * @returns true si el usuario tiene rol 'admin', false en cualquier otro caso
+   */
+  isAdmin(): boolean {
+    const user = this.getUser();
+    return user?.role === 'admin';
+  }
+  
+  /**
    * getToken - Obtiene el token actual
    * @returns Token JWT o null si no existe
    */
@@ -99,9 +126,10 @@ export class AuthService {
   }
   
   /**
-   * logout - Cierra sesión eliminando el token
+   * logout - Cierra sesión eliminando el token y datos del usuario
    */
   logout() { 
-    localStorage.removeItem('edutrack_token'); 
+    localStorage.removeItem('edutrack_token');
+    localStorage.removeItem('edutrack_user');
   }
 }

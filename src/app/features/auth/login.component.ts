@@ -128,10 +128,13 @@ export class LoginComponent {
 
       next: (res) => {
         const token = res.data.token;
+        const user = res.data.user;
         
         if (token) {
-          // Guardar token en localStorage
+          // Guardar token y datos del usuario (incluido el rol)
           this.auth.saveToken(token);
+          this.auth.saveUser(user);
+          
           // Notificar éxito
           this.snackBar.open(MESSAGES.LOGIN_SUCCESS, 'Cerrar', {
             duration: 3000,
