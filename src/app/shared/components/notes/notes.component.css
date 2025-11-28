@@ -1,0 +1,112 @@
+.backdrop{
+  position:fixed; /*El panel queda fijo en pantalla aunque se haga scroll*/
+  top:0;
+  left:0;
+  width:100%; /*Tamaño completo*/
+  height:100%;
+  background:rgba(0,0,0,0.3); /*Sombra oscura*/
+  z-index:1999; /*Asegura que este por encima de otros elementos*/
+}
+
+.notes-panel{
+  position:fixed; /*El panel queda fijo en pantalla aunque se haga scroll*/
+  right:16px; /*Pegado abajo a la derecha*/
+  bottom:16px; /*Pegado abajo a la derecha*/
+  width:900px; /*Ancho del panel*/
+  max-height:40vh; /*Maximo 80% de la altura de la ventana*/
+  background:#ffffff; /*Fondo blanco*/
+  border:1px solid #ddd; /*Borde gris suave*/
+  padding:10px; /*Espacio interno*/
+  display:flex; 
+  flex-direction:row; /*Se ordena en filas*/
+  gap:20px; /*Separacion de 20px entre elementos*/
+  z-index:2000; /*Asegura que este por encima de otros elementos*/
+}
+
+.notes-list{
+  width: 35%; /*Ancho de la lista de notas, ocupa 35% del panel*/
+  height:400px; /*Altura fija de 400px*/
+  list-style:none; /*Quita los puntos de lista por defecto*/
+  margin-right: 10px; /*Espacio a la derecha entre lista y formulario*/
+  margin:0; /*Quita margen por defecto*/
+  padding:0; /*Quita padding por defecto*/
+  overflow-y:auto; /*Barra de scroll vertical si el contenido supera la altura*/
+}
+
+.form-area {  
+  width: 65%; /*Ancho del area de formulario, ocupa 65% del panel*/
+  display:flex; /*Usa flexbox para organizar elementos internos*/
+  flex-direction:column; /*Organiza elementos en columna*/
+  gap:8px; /*Espacio de 8px entre elementos internos*/
+}
+
+.notes-panel .title{
+  width:100%; /*El input ocupa todo el ancho disponible*/
+  padding:8px; /*Espacio interno del input*/
+  border:1px solid #e0e0e0; /*Borde gris claro*/
+  border-radius:4px; /*Esquinas redondeadas*/
+}
+
+.notes-panel textarea{
+  width:100%; /*El textarea ocupa el ancho completo*/
+  resize:vertical; /*Solo permite agrandar hacia arriba/abajo*/
+  height: 80vh;
+  padding:8px; /*Espacio interno*/
+  border:1px solid #e0e0e0; /*Borde gris claro*/
+  border-radius:4px /*Esquinas redondeadas*/
+}
+
+.controls{
+  display:flex; /*Ubica los botones en linea horizontal*/
+  justify-content:flex-end; /*Alinea los botones hacia la derecha*/
+  gap:8px /*Espacio entre botones*/
+}
+
+.save{
+  background:#1976d2; /*Fondo azul*/
+  color:#fff; /*Texto blanco*/
+  border:none; /*Sin borde*/
+  padding:6px 10px; /*Espaciado interno*/
+  border-radius:4px /*Esquinas redondeadas*/
+}
+
+.cancel{
+  background:#f1f1f1; /*Fondo gris claro*/
+  border:none; /*Sin borde*/
+  padding:6px 10px; /*Espaciado interno*/
+  border-radius:4px /*Esquinas redondeadas*/
+}
+
+.notes-list li{
+  border-top:1px solid #f0f0f0; /*Linea separadora arriba*/
+  padding:8px 0 /*Espaciado vertical*/
+}
+
+.row{
+  display:flex; /*Elementos en linea horizontal*/
+  justify-content:space-between; /*Separación maxima entre elementos*/
+  align-items:center /*Alineados verticalmente al centro*/
+}
+
+.note-title{
+  cursor:pointer /*Cambia el cursor para indicar que es interactivo*/
+}
+
+.body{
+  white-space:pre-wrap; /*Respeta saltos de linea del texto*/
+  cursor:pointer; /*Indica que se puede abrir/editar*/
+  margin-top:6px /*Separacion superior del cuerpo respecto al titulo*/
+}
+
+.meta{
+  font-size:11px; /*Texto pequeño*/
+  color:#666; /*Gris oscuro*/
+  margin-top:6px /*Espaciado superior*/
+}
+
+.del{
+  background:transparent; /*Sin fondo visible*/
+  border:none; /*Sin borde*/
+  color:#c51e1e; /*Rojo intenso*/
+  cursor:pointer /*Indica que se puede abrir/editar*/
+}

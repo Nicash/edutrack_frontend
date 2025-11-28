@@ -45,12 +45,12 @@ export const routes: Routes = [
   // Solo accesibles si ESTÃS logueado (gracias a authGuard)
   {
     path: 'subjects',
-    canActivate: [authGuard], // Redirige a /login si no estás logueado
+    canActivate: [authGuard], // Redirige a /login si no estï¿½s logueado
     loadComponent: () => import('./features/subjects/subjects-list/subjects-list.component').then(m => m.SubjectsListComponent)
   },
   {
     path: 'subscriptions',
-    canActivate: [authGuard], // Redirige a /login si no estás logueado
+    canActivate: [authGuard], // Redirige a /login si no estï¿½s logueado
     loadComponent: () => import('./features/subjects/subscriptions/subscriptions.component').then(m => m.SubscriptionsComponent)
   },
   

@@ -14,8 +14,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confirm-dialog.component';
+import { NotesComponent } from './shared/components/notes/notes.component';
 
 // ======================================================================
 // SECCIÓN 2: CONFIGURACIÓN DEL COMPONENTE
@@ -24,7 +26,7 @@ import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confi
 @Component({
   selector: 'app-root',
   standalone: true,  // Componente standalone (no necesita módulo)
-  imports: [RouterOutlet, RouterLink, NgIf, MatToolbarModule, MatButtonModule, MatIconModule],
+  imports: [RouterOutlet, RouterLink, NgIf, MatToolbarModule, MatButtonModule, MatIconModule, MatTooltipModule, MatDialogModule, NotesComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -53,7 +55,7 @@ export class AppComponent {
   private dialog = inject(MatDialog);      // Dialog para confirmaciones
 
   // ======================================================================
-  // SUBSECCIÓN 3.2: MÉTODO DE LOGOUT
+  // SUBSECCIÓN 3.2: MÉTODOS
   // ======================================================================
   /**
    * logout - Cierra la sesión del usuario
@@ -90,5 +92,14 @@ export class AppComponent {
         });
       }
     });
+  }
+
+  //Notas
+
+  showNotes = false; //No mostrar el panel de notas inicialmente
+
+  //Interruptor que abre y cierra el panel
+  toggleNotes() {
+    this.showNotes = !this.showNotes; 
   }
 }

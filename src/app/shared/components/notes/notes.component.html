@@ -1,0 +1,34 @@
+<div class="backdrop" (click)="closePanel()"></div> <!--Cierra el block de notas si se hace click fuera-->
+
+<div class="notes-panel"> <!--Contenedor <div> que tendra la clase CSS llamada notes panel-->
+
+  <!-- LISTA DE NOTAS -->
+  <ul class="notes-list"> <!--Lista de notas-->
+    <li *ngFor="let n of notes"> <!--Bucle que genera un <li> por cada nota en el array de notes-->
+      <div class="row">
+        <strong class="note-title" (click)="open(n)">{{ n.title }}</strong> <!--al hacer click llama a open() para editar la nota-->
+        <button class="del" (click)="remove(n.id)">Eliminar</button> <!--Boton que elimina la nota llamando al metodo remove()-->
+      </div>
+
+      <div class="body" (click)="open(n)">{{ n.body }}</div> <!--Muestra el contenido de la nota-->
+      <div class="meta"><strong>{{ n.updatedAt | date:'short' }}</strong></div> <!--Muestra la fecha de ultima actualizacion-->
+    </li>
+  </ul>
+
+  <!-- FORMULARIO DE EDICION / CREACION -->
+  <div class="form-area"> <!--Contenedor del formulario de nota-->
+
+    <input class="title" [(ngModel)]="newTitle" placeholder="Título" /> <!--Titulo de la nota-->
+    <!--Si el usuario escribe algo, newTitle en el componente se actualiza.-->
+
+    <textarea [(ngModel)]="newNote" placeholder="Escribe una nota..." rows="8"></textarea> <!--Campo de texto para el cuerpo de la nota.-->
+
+    <div class="controls"> <!--Contenedor de botones-->
+      <button class="save" (click)="save()">{{ editingId ? 'Actualizar' : 'Guardar' }}</button> <!--Boton para guardar o actualizar la nota-->
+      <!--Si editingID tiene valor actualiza, sino guarda-->
+
+      <button class="cancel" *ngIf="editingId" (click)="editingId=null; newNote=''; newTitle=''">Cancelar</button> <!--Boton para cancelar-->
+      <!--*ngIf significa que el boton cancelar solo aparece si editingId tiene valor, click limpia la edicion de la nota-->
+    </div>
+  </div>
+</div>

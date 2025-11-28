@@ -9,4 +9,24 @@
     Cerrar sesión
   </button>
 </mat-toolbar>
+
+
+<!-- Boton de Notas -->
+<!--*ngIf: El boton solo aparece si el usuario está logueado.-->
+<!--mat-fab: Convierte el boton en un Floating Action Button de angular material-->
+<!--matTooltip: Al pasar el mouse muestra el texto "mis notas"-->
+<!--Al hacer click llama a toggleNotes(), lo que hace que showNotes = true-->
+<button 
+  *ngIf="auth.isLoggedIn()"
+  mat-fab 
+  class="floating-btn-notes" 
+  matTooltip="Mis Notas"
+  (click)="toggleNotes()"> 
+  <mat-icon>note_add</mat-icon> <!--Angular material dibuja un icono de nota.-->
+</button>
+
+<app-notes *ngIf="showNotes" (close)="toggleNotes()"></app-notes> <!--Solo se muestra si showNotes es true-->
+<!--El componente hijo <app-notes> emite un evento close cuando el usuario cierre el panel-->
+<!--app-notes es el selector del componente notes-->
+
 <router-outlet/>
