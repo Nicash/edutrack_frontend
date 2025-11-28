@@ -1,11 +1,18 @@
-<div class="mini-cal">
+
+<div class="mini-cal"> <!--Contenedor para aplicar estilos-->
+
   <div class="hdr">
-    <button (click)="m = m - 1">‹</button>
-    <div class="title">{{ months[d.getMonth()] }} {{ d.getFullYear() }}</div>
-    <button (click)="m = m + 1">›</button>
+    <button (click)="m = m - 1"><strong>‹</strong></button> <!--Boton para retroceder de mes en el calendario-->
+
+    <div class="title">{{ months[currentDay.getMonth()] }} {{ currentDay.getFullYear() }}</div> <!--Titulo del mes-->
+
+    <button (click)="m = m + 1"><strong>›</strong></button> <!--Boton para avanzar un mes en el calendario-->
   </div>
+
   <div class="grid">
-    <div class="w" *ngFor="let w of ['D','L','M','X','J','V','S']">{{w}}</div>
-    <div *ngFor="let n of days" class="cell" [ngClass]="getEventClass(n)">{{ n }}</div>
+    <div class="w" *ngFor="let w of ['L','M','X','J','V','S','D']">{{w}}</div> <!--Recorre la lista e imprime la inicial del nombre del dia-->
+
+    <div *ngFor="let n of days" class="cell" [ngClass]="getEventClass(n)">{{ n }}</div> <!--Celdas del calendario-->
+    <!--Si el dia es un evento, se agrega una clase adicional-->
   </div>
 </div>

@@ -1,9 +1,54 @@
-.mini-cal{width:320px;font-family:inherit}
-.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.title{font-weight:600}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.w{font-size:11px;text-align:center;color:#666}
-.cell{height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:14px;font-weight:500}
-.cell.exam{background:#FFD700;color:#333}
-.cell.holiday{background:#FF8C00;color:#fff}
-button{background:#fff;border:1px solid #e6e6e6;padding:4px 8px;border-radius:6px}
+.mini-cal{
+    width:320px; /*Ancho fijo del mini calendario*/
+    font-family:inherit /*Usa la misma fuente que el contenedor padre*/
+}
+
+.hdr{
+    display:flex; /*Alinea los elementos horizontalmente*/
+    justify-content:space-between; /*Coloca las flechas a los costados y el título en el centro*/
+    align-items:center; /*Centra verticalmente el contenido*/
+    margin-bottom:6px /*Espacio debajo de la cabecera*/
+}
+
+.title{
+    font-weight:600 /*Texto mas grueso para destacar el mes y año*/
+}
+
+.grid{
+    display:grid; /*Permite crear una grilla para los dias*/
+    grid-template-columns:repeat(7,1fr); /*7 columnas del mismo ancho (una por día de la semana)*/
+    gap:6px /*Espacio entre las celdas*/
+}
+
+.w{
+    font-size:11px; /*Tamaño pequeño para los nombres de los dias (D, L, M…)*/
+    text-align:center; /*Centra el texto*/
+    color:#666 /*Color gris suave*/
+}
+
+.cell{
+    height:32px; /*Alto de cada celda del calendario*/
+    display:flex; /*Para centrar el numero dentro*/
+    align-items:center; /*Centra verticalmente*/
+    justify-content:center; /*Centra horizontalmente*/
+    border-radius:6px; /*Bordes redondeados*/
+    font-size:14px; /* Tamaño de texto estandar*/
+    font-weight:500 /*mas grueso para destacar los dias*/
+}
+
+.cell.exam{
+    background:#FFD700; /*Amarillo para dias de mesas de examenes*/
+    color:#333 /*Texto oscuro para contraste*/
+}
+
+.cell.holiday{
+    background:#FF8C00; /*Naranja fuerte para feriados o dias importantes*/
+    color:#fff /*Texto blanco para contraste*/
+}
+
+button{
+    background:#b9b8b8; /*Fondo para las flechas de navegacion*/
+    border:1px solid #e6e6e6; /*Borde gris claro*/
+    padding:4px 8px; /*Relleno interno*/
+    border-radius:6px /*Bordes redondeados*/
+}
